@@ -22,29 +22,28 @@ import io
 import hashlib
 
 URL_BASE = "https://oyaop.com/jobs/academic-job/"
-Fecha_Final = "-"
-premio="-"
-remuneracion ="-"
-costo="-"
-Requisitos = "-"
-Calificacion = "-"
-Vacantes = "-"
-Semestre = "-"
-Carreras = "-"
+final_date = "-"
+prize="-"
+compensation ="-"
+cost="-"
+requisites = "-"
+grade = "-"
+vacancies = "-"
+semester = "-"
+majors = "-"
 selected_url = "-"
 MAX_PAGES = 6
 counter = 0
 rows = []
 
 # All in same directory
-DRIVER_PATH = '/Users/rodrigoruz/Dook/data-science-base/scrapper/crawlers/chromedriver.exe'
+DRIVER_PATH = '/Users/rodrigoruz/CS221/chromedriver.exe'
 
 # Methods for Image Scrapping
 def fetch_image_urls(query: str, max_links_to_fetch: int, wd: webdriver, sleep_between_interactions: int = 3):
     def scroll_to_end(wd):
         wd.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         time.sleep(sleep_between_interactions)
-
         # build the google query
 
     # search_url = "https://www.google.com/search?safe=off&site=&tbm=isch&source=hp&q={q}&oq={q}&gs_l=img"
@@ -134,101 +133,101 @@ def persist_image(folder_path: str, file_name: str, url: str):
         print(f"ERROR - Could not save {url} - {e}")
 
 #Sofi
-print("Choose Area of Interest...1:Antropología, 2:Arqueología, 3:Artes Escénicas, 4: Artes Visuales, 5:Biología, 6:Ciencias Espaciales")
-print("7:Ciencias Naturales, 8:Ciencias Políticas, 9:Computación, 10:Economía, 11:Educación, 12:Emprendimiento, 13:Estadística, 14:Filosofía")
-print("15:Física, 16:Geografía, 17:Historia, 18:Ingeniería y Tecnología, 19:Lenguaje y Literatura, 20:Leyes, 21:Matemáticas, 22:Marketing")
-print("23:Medicina y Salud, 24:Negocios, 25:Psicología, 26:Química, 27:Sociología, 28:Teología, 29:Trabajo Social, 30:Ventas elige el #: ")
+print("Choose Discipline...1:Anthropology, 2:Archeology, 3:Scenic Arts, 4: Visual Arts, 5:Biology, 6:Aerospace")
+print("7:Natural Science, 8:Political Science, 9:Computer Science, 10:Economics, 11:Education, 12:Entrepreneurship, 13:Statistics, 14:Philosophy")
+print("15:Physics, 16:Geography, 17:History, 18:Engineering and Technology, 19:Language and Literature, 20:Law, 21:Mathematics, 22:Marketing")
+print("23:Medicine and Health, 24:Business, 25:Psychology, 26:Chemistry, 27:Sociology, 28:Theology, 29:Social Work, 30:Sales. Choose a #: ")
 sofi = int(input())
 if sofi == 1:
-    sofi = "Antropología"
+    sofi = "Anthropology"
 elif sofi == 2:
-    sofi = "Arqueología"
+    sofi = "Archeology"
 elif sofi == 3:
-    sofi = "Artes Escénicas"
+    sofi = "Scenic Arts"
 elif sofi == 4:
-    sofi = "Artes Visuales"
+    sofi = "Visual Arts"
 elif sofi == 5:
-    sofi = "Biología"
+    sofi = "Biology"
 elif sofi == 6:
-    sofi = "Ciencias Espaciales"
+    sofi = "Aerospace"
 elif sofi == 7:
-    sofi = "Ciencias Naturales"
+    sofi = "Natural Science"
 elif sofi == 8:
-    sofi = "Ciencias Políticas"
+    sofi = "Political Science"
 elif sofi == 9:
-    sofi = "Computación"
+    sofi = "Computer Science"
 elif sofi == 10:
-    sofi = "Economía"
+    sofi = "Economics"
 elif sofi == 11:
-    sofi = "Educación"
+    sofi = "Education"
 elif sofi == 12:
-    sofi = "Emprendimiento"
+    sofi = "Entrepreneurship"
 elif sofi == 13:
-    sofi = "Estadística"
+    sofi = "Statistics"
 elif sofi == 14:
-    sofi = "Filosofía"
+    sofi = "Philosophy"
 elif sofi == 15:
-    sofi = "Física"
+    sofi = "Physics"
 elif sofi == 16:
-    sofi = "Geografía"
+    sofi = "Geography"
 elif sofi == 17:
-    sofi = "Historia"
+    sofi = "History"
 elif sofi == 18:
-    sofi = "Ingeniería y Tecnología"
+    sofi = "Engineering and Technology"
 elif sofi == 19:
-    sofi = "Lenguaje y Literatura"
+    sofi = "Language and Literature"
 elif sofi == 20:
-    sofi = "Leyes"
+    sofi = "Law"
 elif sofi == 21:
-    sofi = "Matemáticas"
+    sofi = "Mathematics"
 elif sofi == 22:
     sofi = "Marketing"
 elif sofi == 23:
-    sofi = "Medicina y Salud"
+    sofi = "Medicine and Health"
 elif sofi == 24:
-    sofi = "Negocios"
+    sofi = "Business"
 elif sofi == 25:
-    sofi = "Psicología"
+    sofi = "Psychology"
 elif sofi == 26:
-    sofi = "Química"
+    sofi = "Chemistry"
 elif sofi == 27:
-    sofi = "Sociología"
+    sofi = "Sociology"
 elif sofi == 28:
-    sofi = "Teología"
+    sofi = "Theology"
 elif sofi == 29:
-    sofi = "Trabajo Social"
+    sofi = "Social Work"
 elif sofi == 30:
-    sofi = "Ventas"
+    sofi = "Sales"
 else:
     print("Invalid input!")
     import sys
     sys.exit()
 
-#Categoria / Tipo de Oportunidad
-categoria = "Pasantia"
+#type / Tipo de Oportunidad
+type = "Pasantia"
 
-# Nivel Educativo
-nivel = int(input("Elige el Nivel Educativo...1:Preparatoria, 2:Universidad, 3:Posgrado, 4:Todos elige el #: "))
-if nivel == 1:
-    nivel = "Preparatoria"
-elif nivel == 2:
-    nivel = "Universidad"
-elif nivel == 3:
-    nivel = "Posgrado"
-elif nivel == 4:
-    nivel = "Todos"
+# academic_level Educativo
+academic_level = int(input("Choose an Education Level...1:High School, 2:University, 3:Graduate School, 4:All. Choose a #: "))
+if academic_level == 1:
+    academic_level = "High School"
+elif academic_level == 2:
+    academic_level = "University"
+elif academic_level == 3:
+    academic_level = "Graduate School"
+elif academic_level == 4:
+    academic_level = "All"
 else:
     print("Invalid input!")
     import sys
     sys.exit()
 
-idiomas = int(input("Elige el Idioma...1:Español, 2:Inglés, 3:- elige el #: "))
-if idiomas == 1:
-    idiomas = "Español"
-elif idiomas == 2:
-    idiomas = "Inglés"
-elif idiomas == 3:
-    idiomas = "-"
+languages = int(input("Choose a Language...1:Spanish, 2:English, 3:- Choose a #: "))
+if languages == 1:
+    languages = "Spanish"
+elif languages == 2:
+    languages = "English"
+elif languages == 3:
+    languages = "-"
 else:
     print("Invalid input!")
     import sys
@@ -252,18 +251,18 @@ for i in range(1, MAX_PAGES): # Iterate through the number of pages in the websi
         html = BeautifulSoup(req.text, "html.parser")
 
         # Obtain all divs with input
-        entradas = html.find_all('div', {'class': 'col-12 col-sm-6 col-lg-4 py-3'})
+        records = html.find_all('div', {'class': 'col-12 col-sm-6 col-lg-4 py-3'})
         links = html.find_all('div', {'class': 'single_archive_specifics'})
 
-        print(len(entradas))  # Print number of objects found
+        print(len(records))  # Print number of objects found
         print(len(links))  # Print number of objects found
-        # Recorremos todas las entradas para extraer el titulo
-        for j, entrada in enumerate(links):
+        # Iterate through records to extract title
+        for j, record in enumerate(links):
             counter += 1
             if (j != 5) and (j != 11):
-                ## Con el metodo "getText()" nos devuelve el HTML y el titulo de la oportunidad
-                titulo = entrada.find('h5', {'class': 'col-12 py-2 single_archive_title'}).getText()
-                links2 = entrada.find_all('a')
+                ## Use "getText()" method to return HTML and opportunity title
+                title = record.find('h5', {'class': 'col-12 py-2 single_archive_title'}).getText()
+                links2 = record.find_all('a')
                 ## This takes the URL of the opportunity and extracts it from html (retreiving whats between "")
                 import re
 
@@ -278,26 +277,26 @@ for i in range(1, MAX_PAGES): # Iterate through the number of pages in the websi
                     links5 = match[0]
                 # PRINT THIS TO SEE OYA Opportunity Link print("\n", links5)
                 ## Now that we have the link of each opportunity, we go ahead and scrap it
-                URL = str(links5)  # Este es el URL de cada oportunidad
-                req = requests.get(URL)  # Realizamos la peticion a la web
-                status_code = req.status_code  # Comprobamos que la peticion nos devuelve un Status Code = 200
+                URL = str(links5)  # This is the URL for each opportunity
+                req = requests.get(URL)  # Make request to web
+                status_code = req.status_code  # Confirm that request returns Status Code = 200
                 if status_code == 200:
                     html = BeautifulSoup(req.text,
-                                         "html.parser")  # Pasamos el contenido HTML de la web a un objeto BeautifulSoup()
-                    entradas = html.find_all('div', {
-                        'class': 'col-md-9 col-12 ml-0 main pl-0 pr-0 pr-sm-3'})  # Obtenemos todos los divs donde estan las entradas
-                    # Recorremos todas las entradas para extraer el titulo, autor y fecha
-                    for i, entrada in enumerate(entradas):
-                        ## Con el metodo "getText()" no nos devuelve el HTML
-                        titulo = entrada.find('h1', {'col-12 px-0 my-0'}).getText()
-                        deadline = entrada.find('tr', {'class': 'opportunity_deadline'}).getText()
+                                         "html.parser")  # Pass web HTML content to a BeautifulSoup() object
+                    records = html.find_all('div', {
+                        'class': 'col-md-9 col-12 ml-0 main pl-0 pr-0 pr-sm-3'})  # Obtain all divs in the records
+                    # Iterate through all records to extract title, author and date
+                    for i, record in enumerate(records):
+                        ## Use "getText()" to return HTML
+                        title = record.find('h1', {'col-12 px-0 my-0'}).getText()
+                        deadline = record.find('tr', {'class': 'opportunity_deadline'}).getText()
 
                         try:
-                            location = entrada.find('span', {'class': 'pl-1'}).getText()
+                            location = record.find('span', {'class': 'pl-1'}).getText()
                         except:
                             location = "-"
                         ## Extraer link del HTML
-                        official_link = entrada.find('a', {'class': 'px-3 py-2'})
+                        official_link = record.find('a', {'class': 'px-3 py-2'})
                         string = str(official_link)
                         match = re.findall('href.+" target', string, flags=re.IGNORECASE)
                         if match:
@@ -308,8 +307,8 @@ for i in range(1, MAX_PAGES): # Iterate through the number of pages in the websi
                             official_link_3 = match[0]
                         official_link_4 = official_link_3[:-1];
                         # print("Description:",description,"\n") #Uncomment to print description
-                        description = entrada.find('div', {
-                            'class': 'description py-3'}).getText()  # description = entrada.find('p').getText()
+                        description = record.find('div', {
+                            'class': 'description py-3'}).getText()  # description = record.find('p').getText()
 
                         try:
                             split_string = description.split("Eligibility", 1)
@@ -344,48 +343,48 @@ for i in range(1, MAX_PAGES): # Iterate through the number of pages in the websi
                         split_string = description.split("Details", 1)
                         description = split_string[1]
 
-                        Requisitos = entrada.find('div', {
-                            'class': 'description py-3'}).getText()  # description = entrada.find('p').getText()
+                        requisites = record.find('div', {
+                            'class': 'description py-3'}).getText()  # description = record.find('p').getText()
                         try:
-                            split_string = Requisitos.split("Eligibility", 1)
-                            Requisitos = split_string[1]
+                            split_string = requisites.split("Eligibility", 1)
+                            requisites = split_string[1]
                         except:
                             pass
                         try:
-                            split_string = Requisitos.split("Rules", 1)
-                            Requisitos = split_string[1]
+                            split_string = requisites.split("Rules", 1)
+                            requisites = split_string[1]
                         except:
                             pass
                         try:
-                            split_string = Requisitos.split("Qualifications", 1)
-                            Requisitos = split_string[1]
+                            split_string = requisites.split("Qualifications", 1)
+                            requisites = split_string[1]
                         except:
                             pass
                         try:
-                            split_string = Requisitos.split("Requirements", 1)
-                            Requisitos = split_string[1]
+                            split_string = requisites.split("Requirements", 1)
+                            requisites = split_string[1]
                         except:
                             pass
                         try:
-                            split_string = Requisitos.split("Criteria", 1)
-                            Requisitos = split_string[1]
+                            split_string = requisites.split("Criteria", 1)
+                            requisites = split_string[1]
                         except:
                             pass
                         try:
-                            split_string = Requisitos.split("Elegibilities", 1)
-                            Requisitos = split_string[1]
+                            split_string = requisites.split("Elegibilities", 1)
+                            requisites = split_string[1]
                         except:
                             pass
                         try:
-                            split_string = Requisitos.split("Also, visit", 1)
-                            Requisitos = split_string[0]
+                            split_string = requisites.split("Also, visit", 1)
+                            requisites = split_string[0]
                         except:
                             pass
-                        ## URL Imagen
+                        ## URL Image
                         # taking user input
-                        print(titulo)
+                        print(title)
                         if __name__ == '__main__':
-                            queryinput = input("Ingresa un image query: ")
+                            queryinput = input("Enter an image query: ")
                             wd = webdriver.Chrome(executable_path=DRIVER_PATH)
                             queries = [queryinput]  # change your set of queries here
                             for query in queries:
@@ -400,16 +399,16 @@ for i in range(1, MAX_PAGES): # Iterate through the number of pages in the websi
                             selected_url=str(links)
                             selected_url = selected_url[2:-2]
 
-                print(counter, "-", titulo, deadline, location, official_link_4)
+                print(counter, "-", title, deadline, location, official_link_4)
                 # Generate Dataframe
-                rows.append([titulo, categoria, nivel, sofi,description,location,deadline,Fecha_Final,Requisitos,selected_url,official_link_4,Carreras,idiomas,Semestre,Vacantes,Calificacion,premio,remuneracion,costo])
-                df = pd.DataFrame(rows, columns=["Titulo","Tipo","Nivel Educativo","Categoria","Descripcion","Ubicacion","Fecha Inicio", "Fecha Final","Requisitos","Url de IMAGEN","Url (PAGINA WEB)","Carreras","Idiomas","Semestre","Vacantes","Calificacion","Premio","Remuneracion","Costo"])  # print(df)
+                rows.append([title, type, academic_level, sofi,description,location,deadline,final_date,requisites,selected_url,official_link_4,majors,languages,semester,vacancies,grade,prize,compensation,cost])
+                df = pd.DataFrame(rows, columns=["title","Tipo","academic level","discipline","description","location","deadline", "final_date","requisites","Image URL","Url","majors","languages","semester","vacancies","grade","prize","compensation","cost"])  # print(df)
                 df.to_csv('OYA_AcademicJobs.csv', encoding='utf-8-sig') #The encoding allows for writing special characters
                 #df.to_csv('OYA.csv')
                 # else:
                 #   print(status_code)
 
     else:
-        # Si ya no existe la pagina y me da un 400
+        # If page doesnt exist, return error code 400
         print("Status Code %d", statusCode, "Link:")
         break
