@@ -11,6 +11,8 @@ def extract_quals(source:str)->dict:
         dict: dictionary with basic and preferred qualifications for given job
     """    
     source_ls=source.split('QUALIFICATIONS') #in the source code this keyword is the best to be split on
+    if len(source_ls) <3: #if there is no qualifications mentioned we skip this
+        return 'No Qualifications Listed'
     quals=defaultdict()
     level={1:'basic',2:'preferred'} #this serves for dictionary later
     for i in range(1,3): #there are numerous ways that lists are generated in job descriptions, so we need everything to be accounted for
@@ -84,6 +86,8 @@ def extract_desc(source:str)->str:
         str: string containing job description
     """    
     source_ls=source.split('DESCRIPTION')
+    if len(source_ls) <3: #if there is no description mentioned we skip this
+        return 'No Description Listed'
     first_spl=source_ls[1].split('</p>')[0].replace('\\xe2\\x80\\x99s','').replace('</h2><p>','')
     parsed=first_spl.replace('\\xe2\\x80\\x99s','').replace('</h2><p>','').replace('<br/>','')
     return parsed
