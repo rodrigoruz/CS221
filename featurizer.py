@@ -9,6 +9,7 @@ EXTRA_FILE = "OYA_AcademicJobs.csv"
 RESUME_FILE = "UpdatedResumeDataset.csv"
 JOB_FILE = "raw_data_v2.csv"
 EMBEDDING_SIZE = 50
+OUTPUT_FILE = "vectors.txt"
 
 class InputType(Enum):
     JOB = "job profile"
@@ -50,7 +51,7 @@ def featurize(input: dict, input_type: str, num_keywords=5):
     relevant_fields = {
         InputType.EXTRA.value: ['Requisitos', 'Descripcion'],
         InputType.RESUME.value: ['Resume'],
-        InputType.JOB.value: []
+        InputType.JOB.value: ['quals', 'desc']
     }
     text = " ".join([input[field] for field in relevant_fields[input_type]])
     keywords = spacy_nlp(text).ents
@@ -70,12 +71,22 @@ def create_feature_vectors(filename: str, input_type: str):
         all_vecs.append(featurize(d, input_type))
     return all_vecs
 
+def save_vectors_to_txt(vectors: list):
+    with open(OUTPUT_FILE, 'w') as f:
+        text = ""
+        for i, input_name in enumerate(["EXTRACURRICULARS", "RESUMES", "JOB PROFILES"]):
+            vec_text = "\n".join([str(vec) for vec in vectors])
+            text = f"{text}\n{input_name}:\n{vec_text}"
+        f.write(text)
+
+
 if __name__ == "__main__":
     embeddings_dict = create_embedding_dict()
     params = [(EXTRA_FILE, InputType.EXTRA.value), 
         (RESUME_FILE, InputType.RESUME.value), (JOB_FILE, InputType.JOB.value)]
     extracurriculars, resumes, jobs = [create_feature_vectors(filename, input_type)
         for filename, input_type in params]
+    save_vectors_to_txt([extracurriculars, resumes, jobs])
     
     
 
