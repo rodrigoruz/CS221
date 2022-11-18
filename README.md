@@ -18,3 +18,10 @@ We want to meet again sometime later today. I will be online for next ~5hrs so i
 4. Install the proper Chrome driver (eg. 73+) so to be combined with chromedriver version (eg. 73+ too)
 5. Change Driver Path Variable: DRIVER_PATH
 6. Change the URL you are scrapping
+
+## Installation Requirements
+
+Create a new environment, then download SpaCY and the Wikipedia 2014 Glove dataset:
+https://spacy.io/usage
+https://github.com/stanfordnlp/GloVe
+
