@@ -1,5 +1,8 @@
 import pandas as pd 
 import numpy as np
+import re
+import math
+from collections import Counter
 
 def compute_similarity(x:object,y:object)->float:
     """_summary_
@@ -39,11 +42,6 @@ def compute_k_similar_jobs(x:object,df:pd.DataFrame,url_col:str,k:int=5)->list:
         top_jobs.append(df.iloc[i,:][url_col])
     return top_jobs
 
-import re
-import math
-from collections import Counter
-
-
 def get_cosine(vec1, vec2):
     intersection = set(vec1.keys()) & set(vec2.keys())
     numerator = sum([vec1[x] * vec2[x] for x in intersection])
@@ -65,6 +63,9 @@ def text_to_vector(text):
 
 
 def get_result(content_a, content_b):
+    """
+    print(get_result('I love github', 'Who love github')) 
+    """
     text1 = content_a
     text2 = content_b
 
@@ -73,6 +74,3 @@ def get_result(content_a, content_b):
 
     cosine_result = get_cosine(vector1, vector2)
     return cosine_result
-
-
-print(get_result('I love github', 'Who love github')) 
