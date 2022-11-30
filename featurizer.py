@@ -2,6 +2,7 @@ import numpy as np
 import csv
 from enum import Enum
 import spacy
+import similarity_utils
 
 spacy_nlp = spacy.load("en_core_web_sm")
 GLOVE_FILE = "glove.6B.50d.txt"
@@ -9,7 +10,7 @@ EXTRA_FILE = "OYA_AcademicJobs.csv"
 RESUME_FILE = "UpdatedResumeDataset.csv"
 JOB_FILE = "raw_data_v2.csv"
 EMBEDDING_SIZE = 50
-OUTPUT_FILE = "vectors.txt"
+OUTPUT_FILE = "results.txt"
 
 class InputType(Enum):
     JOB = "job profile"
@@ -64,28 +65,24 @@ def featurize(input: dict, input_type: str, num_keywords=5):
     vector = np.concatenate((vector, padding))
     return vector
 
-def create_feature_vectors(filename: str, input_type: str):
-    csv_data = file_to_csv(filename)
-    all_vecs = []
-    for d in csv_data:
-        all_vecs.append(featurize(d, input_type))
-    return all_vecs
+def create_feature_vectors(csv_data: str, input_type: str):
+    return np.vstack((featurize(d, input_type) for d in csv_data))
 
 def save_vectors_to_txt(vectors: list):
     with open(OUTPUT_FILE, 'w') as f:
         text = ""
         for i, input_name in enumerate(["EXTRACURRICULARS", "RESUMES", "JOB PROFILES"]):
-            vec_text = "\n".join([str(vec) for vec in vectors])
-            text = f"{text}\n{input_name}:\n{vec_text}"
+            vec_text = "\n ".join([str(list(vec)) for vec in vectors[i]])
+            text = f"{text} \n {input_name}:\n{vec_text}"
         f.write(text)
-
 
 if __name__ == "__main__":
     embeddings_dict = create_embedding_dict()
-    params = [(EXTRA_FILE, InputType.EXTRA.value), 
-        (RESUME_FILE, InputType.RESUME.value), (JOB_FILE, InputType.JOB.value)]
-    extracurriculars, resumes, jobs = [create_feature_vectors(filename, input_type)
-        for filename, input_type in params]
+    extra_csv, resume_csv, job_csv = [file_to_csv(filename) for filename in (EXTRA_FILE, RESUME_FILE, JOB_FILE)]
+    params = [(extra_csv, InputType.EXTRA.value), 
+        (resume_csv, InputType.RESUME.value), (job_csv, InputType.JOB.value)]
+    extracurriculars, resumes, jobs = [create_feature_vectors(csv_file, input_type)
+        for csv_file, input_type in params]
     save_vectors_to_txt([extracurriculars, resumes, jobs])
     
     
