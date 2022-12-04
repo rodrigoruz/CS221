@@ -1,3 +1,12 @@
+"""
+Extracurricular recommendations done with Spacy. 
+Once the document is read, a simple api similarity can be used to find the cosine similarity 
+between the document vectors. We need to install the package and download the model:
+
+$ pip install spacy
+$ python -m spacy download en_core_web_sm
+"""
+
 import spacy
 nlp = spacy.load('en_core_web_sm')
 string1 = u'Hello hi there!'
