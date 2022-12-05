@@ -7,6 +7,12 @@ $ pip install spacy
 $ python -m spacy download en_core_web_sm
 """
 
+# import os
+# import glob
+import pandas as pd
+# from extractor import extract_job_details
+# import sys
+
 import spacy
 nlp = spacy.load('en_core_web_sm')
 string1 = u'Hello hi there!'
@@ -58,6 +64,15 @@ def best_complement(base,target,list_possible_strings):
         # doc_ideal = nlp(string_ideal)
         # print (doc1.similarity(doc_ideal))
 
+
 if __name__ == "__main__":
     list_possible_strings = [string3, string4]
     best_complement(string5,string1,list_possible_strings)
+
+    # We do the same with the extracurricular dataset
+    filename = 'combined_extracurricular.csv'
+    df = pd.read_csv(filename)
+    df =  df[["Label","Title","Description","Tags","Location","Start Date","Requirements"]]
+    print(df)
+
+    
