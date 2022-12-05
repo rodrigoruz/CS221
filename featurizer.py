@@ -40,15 +40,15 @@ def preprocess(filename: str, max_lines=100):
     return rows
 
 # Map each word to its GLOVE embedding
-def create_embedding_dict():
-    embeddings_dict = {}
-    with open(GLOVE_FILE, 'r', encoding="utf-8") as f:
-        for line in f:
-            values = line.split()
-            word = values[0]
-            vector = np.asarray(values[1:], "float32")
-            embeddings_dict[word] = vector
-    return embeddings_dict
+# def create_embedding_dict():
+#     embeddings_dict = {}
+#     with open(GLOVE_FILE, 'r', encoding="utf-8") as f:
+#         for line in f:
+#             values = line.split()
+#             word = values[0]
+#             vector = np.asarray(values[1:], "float32")
+#             embeddings_dict[word] = vector
+#     return embeddings_dict
 
 # Old featurization method: 
 # 1. extract the keywords from the text using SPACY
@@ -89,8 +89,8 @@ def featurize(input: dict, input_type: str):
     # vector = np.concatenate((vector, padding))
     return vector
 
-def create_feature_vectors(csv_data: list[dict], input_type: str):
-    return np.vstack([featurize(d, input_type) for d in csv_data])
+def create_feature_vectors(current_inputs, input_type):
+    return np.vstack([featurize(input, input_type) for input in current_inputs])
 
 def save_vectors_to_txt(vectors: list):
     with open(OUTPUT_FILE, 'w') as f:
@@ -110,7 +110,6 @@ def top_k_jobs(resume_vector, jobs_vectors, k=5):
     return np.array(top_k_indices)
 
 if __name__ == "__main__":
-    embeddings_dict = create_embedding_dict()
     feature_vectors = {}
     inputs = {}
     for i, filename in enumerate([EXTRA_FILE, RESUME_FILE, JOB_FILE]):
