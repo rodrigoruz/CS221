@@ -91,3 +91,16 @@ def extract_desc(source:str)->str:
     first_spl=source_ls[1].split('</p>')[0].replace('\\xe2\\x80\\x99s','').replace('</h2><p>','')
     parsed=first_spl.replace('\\xe2\\x80\\x99s','').replace('</h2><p>','').replace('<br/>','')
     return parsed
+
+def extract_job_details(source:str)->dict:
+    try:
+        details=defaultdict()
+        job_fam_split=source.split('jobDetails')
+        job_fam=job_fam_split[1].split('category')[1].split(',')[0]
+        details['job_family']=job_fam
+        job_location_split=source.split('<div class="association location-icon">')
+        job_loc=job_location_split[1].split('</div>')[0].split('>')[1]
+        details['job_location']=job_loc
+    except IndexError:
+        return
+    return details
