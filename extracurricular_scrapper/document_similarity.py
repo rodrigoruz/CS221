@@ -12,7 +12,7 @@ $ python -m spacy download en_core_web_sm
 import pandas as pd
 # from extractor import extract_job_details
 # import sys
-
+from pathlib import Path
 import spacy
 nlp = spacy.load('en_core_web_sm')
 string1 = u'Hello hi there!'
@@ -68,11 +68,23 @@ def best_complement(base,target,list_possible_strings):
 if __name__ == "__main__":
     list_possible_strings = [string3, string4]
     best_complement(string5,string1,list_possible_strings)
-
-    # We do the same with the extracurricular dataset
+    # Obtain extracurricular dataset list with opportunity description
     filename = 'combined_extracurricular.csv'
     df = pd.read_csv(filename)
-    df =  df[["Label","Title","Description","Tags","Location","Start Date","Requirements"]]
-    print(df)
+    df =  df[["Label","Title","Description","Tags","Location","Start Date","Requirements"]] # select relevant columns
+    col_list = df.Description.values.tolist() # Using Series.values.tolist()
+    print(col_list[0])
+    # Obtain resume dataset
+    filename2 = 'UpdatedResumeDataSet.csv'
+    df2 = pd.read_csv(Path(__file__).parent/filename2)
+    col_list2 = df2.Resume.values.tolist() # Using Series.values.tolist()
+    text_user_1 = col_list2[0]
+    # Obtain Job Dataset
+    filename3 = 'raw_data.csv'
+    df3 = pd.read_csv(Path(__file__).parent/filename3)
+    print(df3.columns)
+
+    # list_possible_strings = [string3, string4]
+    # best_complement(text_user_1,string1,col_list)
 
     
