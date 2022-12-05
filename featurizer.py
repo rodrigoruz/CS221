@@ -85,7 +85,7 @@ def featurize(input: dict, input_type: str):
     return vector
 
 def create_feature_vectors(csv_data: list[dict], input_type: str):
-    return np.vstack((featurize(d, input_type) for d in csv_data))
+    return np.vstack([featurize(d, input_type) for d in csv_data])
 
 def save_vectors_to_txt(vectors: list):
     with open(OUTPUT_FILE, 'w') as f:
@@ -99,10 +99,10 @@ def save_vectors_to_txt(vectors: list):
 Takes in a feature vector for one resume, then the inputs as well as the feature vectors for all jobs
 Returns a list of k recommended jobs
 '''
-def top_k_jobs(resume_vector, jobs_vectors, jobs_inputs, k=5):
+def top_k_jobs(resume_vector, jobs_vectors, k=5):
     cosine_similarities = similarity_utils.compute_similarity(resume_vector, jobs_vectors)
     top_k_indices = np.argpartition(cosine_similarities, -k)[-k:]
-    return top_k_indices
+    return np.array(top_k_indices)
 
 if __name__ == "__main__":
     embeddings_dict = create_embedding_dict()
@@ -112,9 +112,12 @@ if __name__ == "__main__":
         input_type = [key.value for key in InputType][i]
         inputs[input_type] = preprocess(filename)
         feature_vectors[input_type] = create_feature_vectors(inputs[input_type], input_type)
-    for i, resume_vector in enumerate(feature_vectors[InputType.RESUME.value]):
-        job_recommendations = top_k_jobs(resume_vector, 
-            feature_vectors[InputType.JOB.value], inputs[InputType.JOB.value])
+    job_recommendations = np.vstack([
+        top_k_jobs(resume_vector, feature_vectors[InputType.JOB.value])
+        for resume_vector in feature_vectors[InputType.RESUME.value]
+    ])
+    print(job_recommendations)
+        
         
     
     
