@@ -109,7 +109,7 @@ if __name__ == "__main__":
     df = pd.read_csv(filename, low_memory=False)
     df =  df[["Label","Title","Description","Tags","Location","Start Date","Requirements"]] # select relevant columns
     col_list = df.Description.values.tolist() # Using Series.values.tolist()
-    col_list = col_list[0:200] # first 4 extracurricular opportunities
+    # col_list = col_list[0:200] # first 4 extracurricular opportunities
     # Obtain resume dataset
     filename2 = 'UpdatedResumeDataSet.csv'
     df2 = pd.read_csv(Path(__file__).parent/filename2)
