@@ -3,10 +3,12 @@ import csv
 from enum import Enum
 import spacy
 import similarity_utils
+import nltk
+import gensim
 
 spacy_nlp = spacy.load("en_core_web_sm")
 GLOVE_FILE = "glove.6B.50d.txt"
-EXTRA_FILE = "OYA_AcademicJobs.csv"
+EXTRA_FILE = "extracurricular_scrapper/OYA_AcademicJobs.csv"
 RESUME_FILE = "UpdatedResumeDataset.csv"
 JOB_FILE = "raw_data_v2.csv"
 EMBEDDING_SIZE = 50
@@ -43,26 +45,37 @@ def create_embedding_dict():
             embeddings_dict[word] = vector
     return embeddings_dict
 
-# Featurization method: 
+# Old featurization method: 
 # 1. extract the keywords from the text using SPACY
 # 2. Find the GLOVE embedding for the first 5 keywords (based on a precomputed dictionary). Skip if not found
 # 3. Concentate the embeddings
 # 4. Pad if fewer than 5 keywords were found, to ensure consistent length
+
+# New featurization method:
+# Feed all tokens into Word2Vec using Continuous Bag of Words model
 def featurize(input: dict, input_type: str, num_keywords=5):
     relevant_fields = {
-        InputType.EXTRA.value: ['Requisitos', 'Descripcion'],
+        InputType.EXTRA.value: ['requisites', 'description'],
         InputType.RESUME.value: ['Resume'],
         InputType.JOB.value: ['quals', 'desc']
     }
-    text = " ".join([input[field] for field in relevant_fields[input_type]])
-    keywords = spacy_nlp(text).ents
-    vector = np.asarray([], dtype="float32")
-    for word in keywords[:num_keywords]:
-        word_vec = embeddings_dict.get(str(word).lower(), [])
-        if len(word_vec) > 0:
-            vector = np.concatenate((vector, word_vec))
-    padding = [0.0 for i in range(num_keywords * EMBEDDING_SIZE - len(vector))]
-    vector = np.concatenate((vector, padding))
+    text = " ".join([input[field].replace("\n", " ") for field in relevant_fields[input_type]])
+    tokens = []
+    for i, sentence in enumerate(nltk.sent_tokenize(text)):
+        for word in nltk.word_tokenize(sentence):
+            tokens.append(word.lower())
+    #Bag of words model:
+    model = gensim.models.Word2Vec(tokens, min_count=1, vector_size=100, window=5)
+    model.save("featurizer.model")
+    vector = np.sum(model.syn1neg, axis=0) / model.syn1neg.shape[0]
+    # keywords = spacy_nlp(text).ents
+    # vector = np.asarray([], dtype="float32")
+    # for word in keywords[:num_keywords]:
+    #     word_vec = embeddings_dict.get(str(word).lower(), [])
+    #     if len(word_vec) > 0:
+    #         vector = np.concatenate((vector, word_vec))
+    # padding = [0.0 for i in range(num_keywords * EMBEDDING_SIZE - len(vector))]
+    # vector = np.concatenate((vector, padding))
     return vector
 
 def create_feature_vectors(csv_data: str, input_type: str):
