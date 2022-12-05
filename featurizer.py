@@ -7,6 +7,7 @@ import nltk
 import gensim
 import os
 
+nltk.download('punkt')
 spacy_nlp = spacy.load("en_core_web_sm")
 GLOVE_FILE = "glove.6B.50d.txt"
 EXTRA_FILE = os.path.join("extracurricular_scrapper", "combined_extracurricular.csv")
