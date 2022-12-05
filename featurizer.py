@@ -5,10 +5,11 @@ import spacy
 import similarity_utils
 import nltk
 import gensim
+import os
 
 spacy_nlp = spacy.load("en_core_web_sm")
 GLOVE_FILE = "glove.6B.50d.txt"
-EXTRA_FILE = "extracurricular_scrapper/OYA_AcademicJobs.csv"
+EXTRA_FILE = os.path.join("extracurricular_scrapper", "combined_extracurricular.csv")
 RESUME_FILE = "UpdatedResumeDataset.csv"
 JOB_FILE = "raw_data_v2.csv"
 EMBEDDING_SIZE = 50
@@ -65,7 +66,7 @@ def featurize(input: dict, input_type: str):
     input dictionary that takes keys as column names and values as text
     """
     relevant_fields = {
-        InputType.EXTRA.value: ['requisites', 'description'],
+        InputType.EXTRA.value: ['Description', 'Requirements'],
         InputType.RESUME.value: ['Resume'],
         InputType.JOB.value: ['quals', 'desc']
     }
