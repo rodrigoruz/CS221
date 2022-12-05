@@ -19,7 +19,11 @@ class InputType(Enum):
     RESUME = "resume"
     EXTRA = "extracurricular"
 
-def file_to_csv(filename: str, max_lines=100):
+'''
+Input: name of a CSV file containing documents
+Output: list of dictionaries. Each dictionary represents one document. This is the dict to feed into the featurizer
+'''
+def preprocess(filename: str, max_lines=100):
     with open(filename, 'r', encoding='utf-8') as f:
         reader = csv.reader(f)
         column_names, rows = [], []
@@ -53,7 +57,9 @@ def create_embedding_dict():
 
 # New featurization method:
 # Feed all tokens into Word2Vec using Continuous Bag of Words model
-def featurize(input: dict, input_type: str, num_keywords=5):
+# This gives us a 2d array of shape (num_words_in_bag, word_embedding_length)
+# We average across rows to get a 1d array of shape (1, word_embedding_length)
+def featurize(input: dict, input_type: str):
     relevant_fields = {
         InputType.EXTRA.value: ['requisites', 'description'],
         InputType.RESUME.value: ['Resume'],
@@ -78,7 +84,7 @@ def featurize(input: dict, input_type: str, num_keywords=5):
     # vector = np.concatenate((vector, padding))
     return vector
 
-def create_feature_vectors(csv_data: str, input_type: str):
+def create_feature_vectors(csv_data: list[dict], input_type: str):
     return np.vstack((featurize(d, input_type) for d in csv_data))
 
 def save_vectors_to_txt(vectors: list):
@@ -91,7 +97,7 @@ def save_vectors_to_txt(vectors: list):
 
 if __name__ == "__main__":
     embeddings_dict = create_embedding_dict()
-    extra_csv, resume_csv, job_csv = [file_to_csv(filename) for filename in (EXTRA_FILE, RESUME_FILE, JOB_FILE)]
+    extra_csv, resume_csv, job_csv = [preprocess(filename) for filename in (EXTRA_FILE, RESUME_FILE, JOB_FILE)]
     params = [(extra_csv, InputType.EXTRA.value), 
         (resume_csv, InputType.RESUME.value), (job_csv, InputType.JOB.value)]
     extracurriculars, resumes, jobs = [create_feature_vectors(csv_file, input_type)
