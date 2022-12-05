@@ -7,62 +7,58 @@ $ pip install spacy
 $ python -m spacy download en_core_web_sm
 """
 
-# import os
-# import glob
 import pandas as pd
-# from extractor import extract_job_details
-# import sys
 from pathlib import Path
+import plotly.graph_objects as go
 import spacy
 nlp = spacy.load('en_core_web_sm')
-string1 = u'Hello hi there!'
-string2 = u'Hello hi there!'
-string3 = u'Hey whatsup?'
-string4 = u'Hey whats the day looking like?'
-string5 = u'Hey my name is'
-doc1 = nlp(string1)
-doc2 = nlp(string2)
-doc3 = nlp(string3)
-doc4 = nlp(string4)
-doc5 = nlp(string5)
 
-# print (doc1.similarity(doc2)) # 1.0
-# print (doc2.similarity(doc3)) # 0.3977804622226361
-# print (doc1.similarity(doc3)) # 0.3977804622226361
-# print (doc1.similarity(doc4)) # 0.4393414342057937
-# print (doc1.similarity(doc5)) # 0.29307694741965834
+def test():
+    string1 = u'Hello hi there!'
+    string2 = u'Hello hi there!'
+    string3 = u'Hey whatsup?'
+    string4 = u'Hey whats the day looking like?'
+    string5 = u'Hey my name is'
+    doc1 = nlp(string1)
+    doc2 = nlp(string2)
+    doc3 = nlp(string3)
+    doc4 = nlp(string4)
+    doc5 = nlp(string5)
+    print (doc1.similarity(doc2)) # 1.0
+    print (doc2.similarity(doc3)) # 0.3977804622226361
+    print (doc1.similarity(doc3)) # 0.3977804622226361
+    print (doc1.similarity(doc4)) # 0.4393414342057937
+    print (doc1.similarity(doc5)) # 0.29307694741965834
 
-# Problem: How to make doc4 increase similarity from 0.29 to resemble doc 1
-# Function that adds the other available strings (str 3 and str 4)and chooses which 
-# one best complements str5 to resemble str1
-
-def best_complement(base,target,list_possible_strings):
+def best_complement(base: str, target: str, list_possible_strings:list):
     """
-    This function takes a base string and seeks to make it more cosine
+    This function attempts to make the base string more cosine
     similar to the target string by adding to it a string from the 
     list_possible_strings
+    Input:
+    base: str, original string
+    target: str, target string to which we want the base string to resemble
+    list_possible_strings: list[str], list of strings that can complement base
+
+    Returns:
+    sim_score: flt, best score
+    list_possible_strings.index(i): int, index corresponding to best recommendation in list
+
     """
     best_option = ""
     sim_score = 0
     doc_base = nlp(base)
     doc_target = nlp(target)
     doc_ideal = nlp(base + ' ' + target)
-    print(doc_target.similarity(doc_base)) # Sanity check: better than original
-    print(doc_target.similarity(doc_ideal)) # Sanity check: worse than ideal
+    original_score = doc_target.similarity(doc_base) # Sanity check: better than original
+    ideal_score = doc_target.similarity(doc_ideal) # Sanity check: worse than ideal
     for i in list_possible_strings:
         doc_new = nlp(base + ' ' + i)
         new_sim_score = doc_target.similarity(doc_new) 
         print(list_possible_strings.index(i))
         if new_sim_score > sim_score:
             sim_score = new_sim_score
-            print(sim_score,list_possible_strings.index(i))
-
-        # print(string1.similarity(i))
-    # Sanity check, the output should be better than adding the target string or the base string
-        #  Add the two desired strings, that would be ideal similarity
-        # string_ideal = string1 + ' ' + string4
-        # doc_ideal = nlp(string_ideal)
-        # print (doc1.similarity(doc_ideal))
+    return sim_score, list_possible_strings.index(i), original_score
 
 job1 = """
 DESCRIPTION
@@ -98,7 +94,6 @@ Experience with defining organizational research and development practices in an
 Proven track in leading, mentoring and growing teams of scientists (teams of five or more scientist)"""
 
 if __name__ == "__main__":
-
     ####### . Vanilla Example #####
     # list_possible_strings = [string3, string4]
     # best_complement(string5,string1,list_possible_strings)
@@ -109,7 +104,7 @@ if __name__ == "__main__":
     df = pd.read_csv(filename, low_memory=False)
     df =  df[["Label","Title","Description","Tags","Location","Start Date","Requirements"]] # select relevant columns
     col_list = df.Description.values.tolist() # Using Series.values.tolist()
-    # col_list = col_list[0:200] # first 4 extracurricular opportunities
+    col_list = col_list[0:10] # first 4 extracurricular opportunities
     # Obtain resume dataset
     filename2 = 'UpdatedResumeDataSet.csv'
     df2 = pd.read_csv(Path(__file__).parent/filename2)
@@ -124,8 +119,38 @@ if __name__ == "__main__":
     # print(job1)
 
     # list_possible_strings = [string3, string4]
-    best_complement(text_user_1,job1,col_list)
-    # docsamplejob = nlp(job1)
-    # docsampleuser = nlp(text_user_1)
-    # print (docsamplejob.similarity(docsampleuser)) # 1.0
-    
+    best_sim_score, best_index, original_score = best_complement(text_user_1,job1,col_list)
+
+    ##### Create Radar Chart
+    categories = ['Data Science','HR','Advocate','Arts','Web Designing',
+    'Mechanical Engineer','Sales','Health and fitness','Civil Engineer','Java Developer',
+    'Business Analyst','SAP Developer','Automation Testing','Electrical Engineering',
+    'Operations Manager','Python Developer','DevOps Engineer','Network Security Engineer',
+    'PMO','Database','Hadoop','ETL Developer','DotNet Developer','Blockchain','Testing']
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Scatterpolar(
+        r=[original_score*3, 1.1, 1.1, 1.1, 1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1],
+        theta=categories,
+        fill='toself',
+        name='Product A'
+    ))
+    fig.add_trace(go.Scatterpolar(
+        r=[best_sim_score*5, 1, 1, 1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+        theta=categories,
+        fill='toself',
+        name='Product B',
+        opacity=0.5
+    ))
+
+    fig.update_layout(
+    polar=dict(
+        radialaxis=dict(
+        visible=True,
+        range=[0, 5]
+        )),
+    showlegend=False
+    )
+
+    fig.show()

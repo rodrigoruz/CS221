@@ -60,6 +60,10 @@ def create_embedding_dict():
 # This gives us a 2d array of shape (num_words_in_bag, word_embedding_length)
 # We average across rows to get a 1d array of shape (1, word_embedding_length)
 def featurize(input: dict, input_type: str):
+    """
+    Parameters: 
+    input dictionary that takes keys as column names and values as text
+    """
     relevant_fields = {
         InputType.EXTRA.value: ['requisites', 'description'],
         InputType.RESUME.value: ['Resume'],
