@@ -15,9 +15,9 @@ EMBEDDING_SIZE = 50
 OUTPUT_FILE = "results.txt"
 
 class InputType(Enum):
-    JOB = "job profile"
-    RESUME = "resume"
     EXTRA = "extracurricular"
+    RESUME = "resume"
+    JOB = "job profile"
 
 '''
 Input: name of a CSV file containing documents
@@ -95,14 +95,28 @@ def save_vectors_to_txt(vectors: list):
             text = f"{text} \n {input_name}:\n{vec_text}"
         f.write(text)
 
+'''
+Takes in a feature vector for one resume, then the inputs as well as the feature vectors for all jobs
+Returns a list of k recommended jobs
+'''
+def top_k_jobs(resume_vector, jobs_vectors, jobs_inputs, k=5):
+    cosine_similarities = similarity_utils.compute_similarity(resume_vector, jobs_vectors)
+    top_k_indices = np.argpartition(cosine_similarities, -k)[-k:]
+    return top_k_indices
+
 if __name__ == "__main__":
     embeddings_dict = create_embedding_dict()
-    extra_csv, resume_csv, job_csv = [preprocess(filename) for filename in (EXTRA_FILE, RESUME_FILE, JOB_FILE)]
-    params = [(extra_csv, InputType.EXTRA.value), 
-        (resume_csv, InputType.RESUME.value), (job_csv, InputType.JOB.value)]
-    extracurriculars, resumes, jobs = [create_feature_vectors(csv_file, input_type)
-        for csv_file, input_type in params]
-    save_vectors_to_txt([extracurriculars, resumes, jobs])
+    feature_vectors = {}
+    inputs = {}
+    for i, filename in enumerate([EXTRA_FILE, RESUME_FILE, JOB_FILE]):
+        input_type = [key.value for key in InputType][i]
+        inputs[input_type] = preprocess(filename)
+        feature_vectors[input_type] = create_feature_vectors(inputs[input_type], input_type)
+    for i, resume_vector in enumerate(feature_vectors[InputType.RESUME.value]):
+        job_recommendations = top_k_jobs(resume_vector, 
+            feature_vectors[InputType.JOB.value], inputs[InputType.JOB.value])
+        
+    
     
     
 
