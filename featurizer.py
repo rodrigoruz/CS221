@@ -6,6 +6,7 @@ import similarity_utils
 import nltk
 import gensim
 import os
+import utils
 
 nltk.download('punkt')
 spacy_nlp = spacy.load("en_core_web_sm")
@@ -13,6 +14,7 @@ GLOVE_FILE = "glove.6B.50d.txt"
 EXTRA_FILE = os.path.join("extracurricular_scrapper", "combined_extracurricular.csv")
 RESUME_FILE = "UpdatedResumeDataset.csv"
 JOB_FILE = "raw_data_v2.csv"
+
 EMBEDDING_SIZE = 50
 OUTPUT_FILE = "results.txt"
 
@@ -26,6 +28,9 @@ Input: name of a CSV file containing documents
 Output: list of dictionaries. Each dictionary represents one document. This is the dict to feed into the featurizer
 '''
 def preprocess(filename: str, max_lines=100):
+    if not os.path.exists(filename):
+        if filename == JOB_FILE:
+            utils.load_job_datasets(output_filename=JOB_FILE)
     with open(filename, 'r', encoding='utf-8') as f:
         reader = csv.reader(f)
         column_names, rows = [], []
