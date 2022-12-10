@@ -24,7 +24,7 @@ class InputType(Enum):
 Input: name of a CSV file containing documents
 Output: list of dictionaries. Each dictionary represents one document. This is the dict to feed into the featurizer
 '''
-def preprocess(filename: str, job_file='raw_data_v2.csv', max_lines=100):
+def preprocess(filename: str, job_file='raw_data_v2.csv', max_lines=None):
     if not os.path.exists(filename):
         if filename == job_file:
             utils.load_job_datasets(output_filename=job_file)
@@ -34,7 +34,7 @@ def preprocess(filename: str, job_file='raw_data_v2.csv', max_lines=100):
         for i, line in enumerate(reader):
             if i == 0:
                 column_names = line
-            elif i > max_lines:
+            elif max_lines and i > max_lines:
                 break
             else:
                 current = { column_names[j]: text 

@@ -20,41 +20,51 @@ def top_k_jobs(resume_vector, jobs_vectors, k=5):
     top_k_indices = np.argpartition(cosine_similarities, -k)[-k:]
     return np.array(top_k_indices)
 
-def evaluate_accuracy(job_recommendations, job_labels, resume_inputs, split_by_type=True):
+def evaluate_accuracy(job_recommendations, job_labels, resume_inputs, eval_size=300, split_by_type=True):
     num_correct = 0
     num_correct_by_type = defaultdict(lambda: 0)
     count_by_type = defaultdict(lambda: 0)
     num_examples, k = job_recommendations.shape
+    accuracies = {}
     for i, rec in enumerate(job_recommendations):
+        if i > eval_size: continue
         true_label = resume_inputs[i]['Category']
         predicted_labels = []
         for idx in rec:
             predicted_labels += job_labels[idx]
+        print(true_label, predicted_labels)
         correct = true_label in predicted_labels
         num_correct += correct
         num_correct_by_type[true_label] += correct
         count_by_type[true_label] += 1
-    print(f"Overall accuracy with K={k}: {num_correct / num_examples}")
+    accuracy = num_correct / num_examples
+    print(f"Overall accuracy with size={eval_size}: {accuracy}")
+    accuracies["overall"] = accuracy
     if split_by_type:
         for candidate_type in num_correct_by_type.keys():
             accuracy = num_correct_by_type[candidate_type] / count_by_type[candidate_type]
             print(f"{candidate_type} accuracy with K={k}: {accuracy}")
+            accuracies[candidate_type] = accuracy
+    return accuracies
 
-def compute_all_accuracies(feature_vectors: dict, inputs: dict, k_values: list, split_by_type: bool):
-    for k in k_values:
+def compute_all_accuracies(feature_vectors: dict, inputs: dict, eval_sizes: list, split_by_type: bool):
+    accuracies_by_size = {}
+    for size in eval_sizes:
         job_recommendations = np.vstack([
             top_k_jobs(resume_vector, feature_vectors[InputType.JOB.value], k=k)
             for resume_vector in feature_vectors[InputType.RESUME.value]
         ])
+        print(job_recommendations)
         job_labels = perform_labeling(raw_data=JOB_FILE, output_filename=JOB_FILE_LABELED)
-        evaluate_accuracy(job_recommendations, job_labels, inputs[InputType.RESUME.value])
+        accuracies_by_size[size] = evaluate_accuracy(job_recommendations, job_labels, inputs[InputType.RESUME.value])
+    return accuracies_by_size
 
 if __name__ == "__main__":
     feature_vectors = {}
     inputs = {}
     for i, filename in enumerate([EXTRA_FILE, RESUME_FILE, JOB_FILE]):
         input_type = [key.value for key in InputType][i]
-        inputs[input_type] = preprocess(filename, job_file=JOB_FILE, max_lines=1000)
+        inputs[input_type] = preprocess(filename, job_file=JOB_FILE, max_lines=300)
         feature_vectors[input_type] = create_feature_vectors(inputs[input_type], input_type)
-    k_values = [1, 3, 5, 10]
-    compute_all_accuracies(feature_vectors, inputs, k_values, split_by_type=True)
+    eval_sizes = [100 * i for i in range(1, 11)]
+    accuracies_by_k = compute_all_accuracies(feature_vectors, inputs, eval_sizes, split_by_type=True)
