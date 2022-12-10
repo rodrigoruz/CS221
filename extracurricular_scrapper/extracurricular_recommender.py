@@ -195,36 +195,36 @@ if __name__ == "__main__":
     print("Final Accuracy percentage : " + str(res))
 
 
-    ##### Create Radar Chart
-    categories = ['Data Science','HR','Advocate','Arts','Web Designing',
-    'Mechanical Engineer','Sales','Health and fitness','Civil Engineer','Java Developer',
-    'Business Analyst','SAP Developer','Automation Testing','Electrical Engineering',
-    'Operations Manager','Python Developer','DevOps Engineer','Network Security Engineer',
-    'PMO','Database','Hadoop','ETL Developer','DotNet Developer','Blockchain','Testing']
+    # ##### Create Radar Chart
+    # categories = ['Data Science','HR','Advocate','Arts','Web Designing',
+    # 'Mechanical Engineer','Sales','Health and fitness','Civil Engineer','Java Developer',
+    # 'Business Analyst','SAP Developer','Automation Testing','Electrical Engineering',
+    # 'Operations Manager','Python Developer','DevOps Engineer','Network Security Engineer',
+    # 'PMO','Database','Hadoop','ETL Developer','DotNet Developer','Blockchain','Testing']
 
-    fig = go.Figure()
+    # fig = go.Figure()
 
-    fig.add_trace(go.Scatterpolar(
-        r=[original_score*3, original_score*2, 0.1, 0.1, 0.1,original_score*2.5,original_score*2.5,0.1,original_score*2.5,0.1,0.1,0.1,0.1,original_score*2,original_score*1,original_score*1.5,0.1,original_score*2.2,original_score*2,0.1,0.1,0.1,0.1],
-        theta=categories,
-        fill='toself',
-        name='Product A'
-    ))
-    fig.add_trace(go.Scatterpolar(
-        r=[best_sim_score*4, best_sim_score*3, 0.3, 0.3, 0.3,original_score*2.5,original_score*2.5,0.3,best_sim_score*4,0.3,0.3,0.3,0.3,best_sim_score*4.5,best_sim_score*3.5,0.3,best_sim_score*3.5,original_score*3.5,original_score*3,0.3,0.3,0.3,0.3],
-        theta=categories,
-        fill='toself',
-        name='Product B',
-        opacity=0.5
-    ))
+    # fig.add_trace(go.Scatterpolar(
+    #     r=[original_score*3, original_score*2, 0.1, 0.1, 0.1,original_score*2.5,original_score*2.5,0.1,original_score*2.5,0.1,0.1,0.1,0.1,original_score*2,original_score*1,original_score*1.5,0.1,original_score*2.2,original_score*2,0.1,0.1,0.1,0.1],
+    #     theta=categories,
+    #     fill='toself',
+    #     name='Product A'
+    # ))
+    # fig.add_trace(go.Scatterpolar(
+    #     r=[best_sim_score*4, best_sim_score*3, 0.3, 0.3, 0.3,original_score*2.5,original_score*2.5,0.3,best_sim_score*4,0.3,0.3,0.3,0.3,best_sim_score*4.5,best_sim_score*3.5,0.3,best_sim_score*3.5,original_score*3.5,original_score*3,0.3,0.3,0.3,0.3],
+    #     theta=categories,
+    #     fill='toself',
+    #     name='Product B',
+    #     opacity=0.5
+    # ))
 
-    fig.update_layout(
-    polar=dict(
-        radialaxis=dict(
-        visible=True,
-        range=[0, 5]
-        )),
-    showlegend=False
-    )
+    # fig.update_layout(
+    # polar=dict(
+    #     radialaxis=dict(
+    #     visible=True,
+    #     range=[0, 5]
+    #     )),
+    # showlegend=False
+    # )
 
-    fig.show()
+    # fig.show()
