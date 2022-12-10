@@ -74,6 +74,42 @@ def random_list(N,val1,val2):
     # return the resultant random numbers list
     return randomList 
 
+def create_radar_chart():
+    ##### Create Radar Chart
+    categories = ['Data Science','HR','Advocate','Arts','Web Designing',
+    'Mechanical Engineer','Sales','Health and fitness','Civil Engineer','Java Developer',
+    'Business Analyst','SAP Developer','Automation Testing','Electrical Engineering',
+    'Operations Manager','Python Developer','DevOps Engineer','Network Security Engineer',
+    'PMO','Database','Hadoop','ETL Developer','DotNet Developer','Blockchain','Testing']
+
+    fig = go.Figure()
+
+    # fig.add_trace(go.Scatterpolar(
+    #     r=[original_score*3, 1.1, 1.1, 1.1, 1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1],
+    #     theta=categories,
+    #     fill='toself',
+    #     name='Product A'
+    # ))
+    # fig.add_trace(go.Scatterpolar(
+    #     r=[best_sim_score*5, 1, 1, 1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    #     theta=categories,
+    #     fill='toself',
+    #     name='Product B',
+    #     opacity=0.5
+    # ))
+
+    # fig.update_layout(
+    # polar=dict(
+    #     radialaxis=dict(
+    #     visible=True,
+    #     range=[0, 5]
+    #     )),
+    # showlegend=False
+    # )
+
+    # fig.show()
+
+
 if __name__ == "__main__":
     ####### Obtain job recommendations for each user by running featurizer.py #####
     #run featurizer.py
@@ -92,10 +128,10 @@ if __name__ == "__main__":
     
 
     ###### Compute accuracy for N random users and Z random extracurricular opportunities ###########
-    Z = 2
+    Z = 1
     col_list = [] #initialize list of extracurriculars to be used for training
     col_list_index = [] #initialize list of extracurriculars to be used for training
-    random_list_extrac_index = random_list(Z,0,100)
+    random_list_extrac_index = random_list(Z,0,742)
     for m in random_list_extrac_index:
         col_list.append(extrac_list[m]) # first m extracurricular opportunities
         col_list_index.append(m)
@@ -139,48 +175,56 @@ if __name__ == "__main__":
         print(final_best_sim_score, final_best_index, final_original_score)
         label_extracurricular = df['Label'][final_best_index]
         title_extracurricular = df['Title'][final_best_index]
-
         ## We compare these two to get an accuracy measurement
-        print(label_extracurricular,title_extracurricular)
-        print(final_job_label) # label for the job
         # True if label is right, false if its not
-        correct_recommendation = common_func(label_extracurricular, final_job_label)
-        print(correct_recommendation)
+        # Split to convert to a list
+        label_extracurricular = label_extracurricular[1:-1].replace('"',"").split(',')
+        final_job_label = final_job_label[1:-1].replace('"',"").split(',')
+        # print(label_extracurricular,final_job_label)
+
+        correct_recommendation = False
+        for x in final_job_label:
+            for y in label_extracurricular:
+                if x == y:
+                    correct_recommendation = True
+                    break
         evaluation_list.append(correct_recommendation)
 
     print(evaluation_list)
+    res = (len(list(filter(lambda ele: ele == True, evaluation_list))) / len(evaluation_list)) * 100
+    print("Final Accuracy percentage : " + str(res))
 
 
-    # ##### Create Radar Chart
-    # categories = ['Data Science','HR','Advocate','Arts','Web Designing',
-    # 'Mechanical Engineer','Sales','Health and fitness','Civil Engineer','Java Developer',
-    # 'Business Analyst','SAP Developer','Automation Testing','Electrical Engineering',
-    # 'Operations Manager','Python Developer','DevOps Engineer','Network Security Engineer',
-    # 'PMO','Database','Hadoop','ETL Developer','DotNet Developer','Blockchain','Testing']
+    ##### Create Radar Chart
+    categories = ['Data Science','HR','Advocate','Arts','Web Designing',
+    'Mechanical Engineer','Sales','Health and fitness','Civil Engineer','Java Developer',
+    'Business Analyst','SAP Developer','Automation Testing','Electrical Engineering',
+    'Operations Manager','Python Developer','DevOps Engineer','Network Security Engineer',
+    'PMO','Database','Hadoop','ETL Developer','DotNet Developer','Blockchain','Testing']
 
-    # fig = go.Figure()
+    fig = go.Figure()
 
-    # fig.add_trace(go.Scatterpolar(
-    #     r=[original_score*3, 1.1, 1.1, 1.1, 1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1],
-    #     theta=categories,
-    #     fill='toself',
-    #     name='Product A'
-    # ))
-    # fig.add_trace(go.Scatterpolar(
-    #     r=[best_sim_score*5, 1, 1, 1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-    #     theta=categories,
-    #     fill='toself',
-    #     name='Product B',
-    #     opacity=0.5
-    # ))
+    fig.add_trace(go.Scatterpolar(
+        r=[original_score*3, original_score*2, 0.1, 0.1, 0.1,original_score*2.5,original_score*2.5,0.1,original_score*2.5,0.1,0.1,0.1,0.1,original_score*2,original_score*1,original_score*1.5,0.1,original_score*2.2,original_score*2,0.1,0.1,0.1,0.1],
+        theta=categories,
+        fill='toself',
+        name='Product A'
+    ))
+    fig.add_trace(go.Scatterpolar(
+        r=[best_sim_score*4, best_sim_score*3, 0.3, 0.3, 0.3,original_score*2.5,original_score*2.5,0.3,best_sim_score*4,0.3,0.3,0.3,0.3,best_sim_score*4.5,best_sim_score*3.5,0.3,best_sim_score*3.5,original_score*3.5,original_score*3,0.3,0.3,0.3,0.3],
+        theta=categories,
+        fill='toself',
+        name='Product B',
+        opacity=0.5
+    ))
 
-    # fig.update_layout(
-    # polar=dict(
-    #     radialaxis=dict(
-    #     visible=True,
-    #     range=[0, 5]
-    #     )),
-    # showlegend=False
-    # )
+    fig.update_layout(
+    polar=dict(
+        radialaxis=dict(
+        visible=True,
+        range=[0, 5]
+        )),
+    showlegend=False
+    )
 
-    # fig.show()
+    fig.show()
