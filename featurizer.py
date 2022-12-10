@@ -103,6 +103,10 @@ def save_vectors_to_txt(vectors: list):
             text = f"{text} \n {input_name}:\n{vec_text}"
         f.write(text)
 
+
+
+
+
         
         
     

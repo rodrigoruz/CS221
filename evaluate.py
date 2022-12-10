@@ -51,10 +51,10 @@ def compute_all_accuracies(feature_vectors: dict, inputs: dict, eval_sizes: list
     accuracies_by_size = {}
     for size in eval_sizes:
         job_recommendations = np.vstack([
-            top_k_jobs(resume_vector, feature_vectors[InputType.JOB.value], k=k)
+            top_k_jobs(resume_vector, feature_vectors[InputType.JOB.value])
             for resume_vector in feature_vectors[InputType.RESUME.value]
         ])
-        print(job_recommendations)
+        np.save('extracurricular_scrapper/data.npy', job_recommendations) # save
         job_labels = perform_labeling(raw_data=JOB_FILE, output_filename=JOB_FILE_LABELED)
         accuracies_by_size[size] = evaluate_accuracy(job_recommendations, job_labels, inputs[InputType.RESUME.value])
     return accuracies_by_size
