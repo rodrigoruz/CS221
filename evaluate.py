@@ -46,6 +46,7 @@ def compute_all_accuracies(feature_vectors: dict, inputs: dict, k_values: list, 
             top_k_jobs(resume_vector, feature_vectors[InputType.JOB.value], k=k)
             for resume_vector in feature_vectors[InputType.RESUME.value]
         ])
+        np.save('extracurricular_scrapper/data.npy', job_recommendations) # save
         job_labels = perform_labeling(raw_data=JOB_FILE, output_filename=JOB_FILE_LABELED)
         evaluate_accuracy(job_recommendations, job_labels, inputs[InputType.RESUME.value])
 
