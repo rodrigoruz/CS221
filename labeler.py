@@ -1,10 +1,6 @@
 import pandas as pd
 import numpy as np
 
-raw_data='raw_data.csv' #actual path for data
-
-rw_df=pd.read_csv(raw_data)
-
 
 label_mapping=['Data Science','HR','Advocate','Arts','Web Designing',
  'Mechanical Engineer','Sales','Health and fitness','Civil Engineer'
@@ -31,53 +27,59 @@ def generate_label(mapping:list,description:str)->list:
             labels.append(l)
     return labels
 
+def perform_labeling(raw_data, output_filename):
 
-data=pd.read_csv('https://raw.githubusercontent.com/rodrigoruz/CS221/main/extracurricular_scrapper/combined_extracurricular.csv')
-
-
-candidates_tags=[]
-
-for x in data['Tags']:
-#iterating through all tags in extracurriculars
-    try:
-
-        candidates_tags.append(generate_label(label_mapping,x))
-
-    except:
-
-        candidates_tags.append([])
-
-candidates_desc=[]
-
-for x in data['Description']:
-
-    try:
-
-        candidates_desc.append(generate_label(label_mapping,x))
-
-    except:
-
-        candidates_desc.append([])
-
-candidates_req=[]
-for x in data['Requirements']:
-    try:
-        candidates_req.append(generate_label(label_mapping,x))
-    except:
-        candidates_req.append([])
+    rw_df=pd.read_csv(raw_data)
 
 
-conc_list=[list(set(a + b + c)) for a, b, c in list(zip(candidates_desc, candidates_tags,candidates_req))] #merging all possible tags from 3 different sources and removing duplicates
-
-data['Label']=conc_list
+    data=pd.read_csv('https://raw.githubusercontent.com/rodrigoruz/CS221/main/extracurricular_scrapper/combined_extracurricular.csv')
 
 
-candidates_job_desc=[]
-for x in rw_df.desc:
-    #labeling in jobs dataset
-    try:
-        candidates_job_desc.append(generate_label(label_mapping,x))
-    except:
-        candidates_job_desc.append([])
+    candidates_tags=[]
 
-rw_df['label']=candidates_job_desc
+    for x in data['Tags']:
+    #iterating through all tags in extracurriculars
+        try:
+
+            candidates_tags.append(generate_label(label_mapping,x))
+
+        except:
+
+            candidates_tags.append([])
+
+    candidates_desc=[]
+
+    for x in data['Description']:
+
+        try:
+
+            candidates_desc.append(generate_label(label_mapping,x))
+
+        except:
+
+            candidates_desc.append([])
+
+    candidates_req=[]
+    for x in data['Requirements']:
+        try:
+            candidates_req.append(generate_label(label_mapping,x))
+        except:
+            candidates_req.append([])
+
+
+    conc_list=[list(set(a + b + c)) for a, b, c in list(zip(candidates_desc, candidates_tags,candidates_req))] #merging all possible tags from 3 different sources and removing duplicates
+
+    data['Label']=conc_list
+
+
+    candidates_job_desc=[]
+    for x in rw_df.desc:
+        #labeling in jobs dataset
+        try:
+            candidates_job_desc.append(generate_label(label_mapping,x))
+        except:
+            candidates_job_desc.append([])
+
+    rw_df['label']=candidates_job_desc
+    rw_df.to_csv(output_filename, encoding='utf-8')
+    return rw_df['label'].tolist()

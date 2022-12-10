@@ -11,9 +11,6 @@ import utils
 nltk.download('punkt')
 spacy_nlp = spacy.load("en_core_web_sm")
 GLOVE_FILE = "glove.6B.50d.txt"
-EXTRA_FILE = os.path.join("extracurricular_scrapper", "combined_extracurricular.csv")
-RESUME_FILE = "UpdatedResumeDataset.csv"
-JOB_FILE = "raw_data_v2.csv"
 
 EMBEDDING_SIZE = 50
 OUTPUT_FILE = "results.txt"
@@ -27,10 +24,10 @@ class InputType(Enum):
 Input: name of a CSV file containing documents
 Output: list of dictionaries. Each dictionary represents one document. This is the dict to feed into the featurizer
 '''
-def preprocess(filename: str, max_lines=100):
+def preprocess(filename: str, job_file='raw_data_v2.csv', max_lines=100):
     if not os.path.exists(filename):
-        if filename == JOB_FILE:
-            utils.load_job_datasets(output_filename=JOB_FILE)
+        if filename == job_file:
+            utils.load_job_datasets(output_filename=job_file)
     with open(filename, 'r', encoding='utf-8') as f:
         reader = csv.reader(f)
         column_names, rows = [], []
@@ -106,27 +103,10 @@ def save_vectors_to_txt(vectors: list):
             text = f"{text} \n {input_name}:\n{vec_text}"
         f.write(text)
 
-'''
-Takes in a feature vector for one resume, then the inputs as well as the feature vectors for all jobs
-Returns a list of k recommended jobs
-'''
-def top_k_jobs(resume_vector, jobs_vectors, k=5):
-    cosine_similarities = similarity_utils.compute_similarity(resume_vector, jobs_vectors)
-    top_k_indices = np.argpartition(cosine_similarities, -k)[-k:]
-    return np.array(top_k_indices)
 
-if __name__ == "__main__":
-    feature_vectors = {}
-    inputs = {}
-    for i, filename in enumerate([EXTRA_FILE, RESUME_FILE, JOB_FILE]):
-        input_type = [key.value for key in InputType][i]
-        inputs[input_type] = preprocess(filename)
-        feature_vectors[input_type] = create_feature_vectors(inputs[input_type], input_type)
-    job_recommendations = np.vstack([
-        top_k_jobs(resume_vector, feature_vectors[InputType.JOB.value])
-        for resume_vector in feature_vectors[InputType.RESUME.value]
-    ])
-    print(job_recommendations)
+
+
+
         
         
     
