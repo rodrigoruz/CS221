@@ -13,6 +13,7 @@ from pathlib import Path
 import plotly.graph_objects as go
 import spacy
 nlp = spacy.load('en_core_web_sm')
+import random
 
 def best_complement(base: str, target: str, list_possible_strings:list):
     """
@@ -44,6 +45,35 @@ def best_complement(base: str, target: str, list_possible_strings:list):
             sim_score = new_sim_score
     return sim_score, list_possible_strings.index(i), original_score
 
+def common_func(A, B):
+    """
+    Function to evaluate if there is at least one item of list A in list B
+    """
+    c = False
+    # traverse in the 1st list
+    for i in A:
+		# traverse in the 2nd list
+        for j in B:
+			# if one common
+            if i == j:
+                c=True
+                return c
+    return c
+
+def random_list(N,val1,val2):
+    """
+    Create a random list of N random numbers (non-duplicates)
+    """
+    randomList=[] # resultant random numbers list
+    # traversing the loop 15 times
+    for i in range(N):
+        r=random.randint(val1,val2) # generating a random number in the range 1 to 10
+        if r not in randomList: # checking whether the generated random number is not in the list
+            # appending the random number to the resultant list, if the condition is true
+            randomList.append(r)
+    # return the resultant random numbers list
+    return randomList 
+
 if __name__ == "__main__":
     ####### Obtain job recommendations for each user by running featurizer.py #####
     #run featurizer.py
@@ -54,53 +84,71 @@ if __name__ == "__main__":
     filename = 'combined_extracurricular_labeled.csv'
     df = pd.read_csv(filename, low_memory=False)
     df =  df[["Label","Title","Description","Tags","Requirements"]] # select relevant columns
-    col_list = df.Description.values.tolist() # Using Series.values.tolist()
-    col_list = col_list[0:3] # first 4 extracurricular opportunities
+    extrac_list = df.Description.values.tolist() # Using Series.values.tolist()
     # # Obtain resume dataset
     filename2 = 'UpdatedResumeDataSet.csv'
     df2 = pd.read_csv(Path(__file__).parent/filename2)
     col_list2 = df2.Resume.values.tolist() # Using Series.values.tolist()
-    text_user_1 = col_list2[0]
-    # print(text_user_1) #CS profile
     
-    ###### Obtain data from the recommended jobs ####### 
-    filename3 = "../raw_data_0.csv"
-    df3 = pd.read_csv(filename3)
-    k = 5 # number of recommended jobs by featurizer.py
-    for i in range(k):
-        job_index = new_num_arr[0][i] # index of the k jobs recommended to the user
-        job_desc = df3['desc'][job_index] # description for the job
-        job_label = df3['labels'][job_index] # label for the job
-        # job_quals = df3['qual'][job_index] # qualifications for the job
-        # job_details = df3['details'][job_index] # details for the job
+
+    ###### Compute accuracy for N random users and Z random extracurricular opportunities ###########
+    Z = 2
+    col_list = [] #initialize list of extracurriculars to be used for training
+    col_list_index = [] #initialize list of extracurriculars to be used for training
+    random_list_extrac_index = random_list(Z,0,100)
+    for m in random_list_extrac_index:
+        col_list.append(extrac_list[m]) # first m extracurricular opportunities
+        col_list_index.append(m)
+
+    N = 1 # number of users 
+    random_list_user_index = random_list(N,0,99)
+    evaluation_list = []
+
+    for m in random_list_user_index:
+        index = m
+        text_user_1 = col_list2[index]
         
-        # Compute similarity score for first user
-        best_sim_score, best_index, original_score = best_complement(text_user_1,job_desc,col_list)
-        # extract best extracurricular recommendation
-        if i == 0:
-            final_best_sim_score = best_sim_score
-            final_best_index = best_index
-            final_original_score = original_score
-            final_job_label = job_label 
-        else:
-            # If the recommendation improves in one of the iterations, replace
-            if (best_sim_score > final_best_sim_score):
+        ###### Obtain data from the recommended jobs ####### 
+        filename3 = "../raw_data_0.csv"
+        df3 = pd.read_csv(filename3)
+        k = 5 # number of recommended jobs by featurizer.py
+        for i in range(k):
+            job_index = new_num_arr[index][i] # index of the k jobs recommended to the user
+            job_desc = df3['desc'][job_index] # description for the job
+            job_label = df3['labels'][job_index] # label for the job
+            # job_quals = df3['qual'][job_index] # qualifications for the job
+            # job_details = df3['details'][job_index] # details for the job
+            
+            # Compute similarity score for first user
+            best_sim_score, best_index, original_score = best_complement(text_user_1,job_desc,col_list)
+            # extract best extracurricular recommendation from actual dataset
+            if i == 0:
                 final_best_sim_score = best_sim_score
-                final_best_index = best_index
+                final_best_index = col_list_index[best_index]
                 final_original_score = original_score
                 final_job_label = job_label 
+            else:
+                # If the recommendation improves in one of the iterations, replace
+                if (best_sim_score > final_best_sim_score):
+                    final_best_sim_score = best_sim_score
+                    final_best_index = col_list_index[best_index]
+                    final_original_score = original_score
+                    final_job_label = job_label 
 
-    # Get data of the best extracurricular recommendation
-    print(final_best_sim_score, final_best_index, final_original_score)
-    label_extracurricular = df['Label'][final_best_index]
-    title_extracurricular = df['Title'][final_best_index]
+        # Get data of the best extracurricular recommendation
+        print(final_best_sim_score, final_best_index, final_original_score)
+        label_extracurricular = df['Label'][final_best_index]
+        title_extracurricular = df['Title'][final_best_index]
 
-    ## We compare these two to get an accuracy measurement
-    print(label_extracurricular,title_extracurricular)
-    print(final_job_label) # label for the job
-    a_set = set(final_job_label)
-    correct_recommendation = any(x in a_set for x in label_extracurricular) # True if label is right, false if its not
-    print(correct_recommendation)
+        ## We compare these two to get an accuracy measurement
+        print(label_extracurricular,title_extracurricular)
+        print(final_job_label) # label for the job
+        # True if label is right, false if its not
+        correct_recommendation = common_func(label_extracurricular, final_job_label)
+        print(correct_recommendation)
+        evaluation_list.append(correct_recommendation)
+
+    print(evaluation_list)
 
 
     # ##### Create Radar Chart
